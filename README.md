@@ -91,6 +91,7 @@ Anything in `[square brackets]` is a placeholder you fill in. The preview pane h
 - Profile-seeded block tree with per-line checkboxes
 - Every preset line is editable in place; `[bracketed placeholders]` are highlighted and counted
 - Add any preset block from the dropdown, or create a **Custom block** with your own heading
+- A **Blank** start for building a set from scratch, with no sections and no preset lines
 - Drag blocks by the handle to reorder — order matters in instructions
 - Live preview with word count, character count and an unfilled-placeholder counter
 - **Generate .txt** download and **Copy** to clipboard (`Ctrl`/`Cmd`+`S` also generates)
@@ -128,7 +129,7 @@ Anything in `[square brackets]` is a placeholder you fill in. The preview pane h
 </details>
 
 <details>
-<summary><b>The twelve profiles</b></summary>
+<summary><b>The twelve profiles, plus a blank start</b></summary>
 
 <br>
 
@@ -146,6 +147,7 @@ Anything in `[square brackets]` is a placeholder you fill in. The preview pane h
 | Teaching & Tutoring | Socratic pacing, worked steps, understanding over answers |
 | Contracts & Policy | Quote the text, flag the risk, leave conclusions to a human |
 | Personal Assistant | Practical, low-friction planning and admin |
+| Blank | Nothing loaded. Add only the blocks you want, in the order you want them |
 
 </details>
 

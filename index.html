@@ -33,6 +33,7 @@
   --border:#E2DFD4; --border-strong:#D3CFC2;
   --text:#1F1E1D; --text-2:#4A4741; --muted:#7C776E;
   --accent:#C96442; --accent-2:#B0553A; --accent-soft:#F6E7E0;
+  --accent-muted:#E2B8A6; --accent-muted-text:#A9614A;
   --ok:#5B7F5B; --warn:#A6772B;
   --shadow:0 1px 2px rgba(31,30,29,.05), 0 8px 24px -12px rgba(31,30,29,.18);
   --radius:14px;
@@ -46,6 +47,7 @@
   --border:#3A3936; --border-strong:#4A4844;
   --text:#F0EEE6; --text-2:#D6D2C6; --muted:#948F84;
   --accent:#D97757; --accent-2:#E38A6D; --accent-soft:#3A2A23;
+  --accent-muted:#6B4636; --accent-muted-text:#C4876E;
   --ok:#8FB98F; --warn:#D6A75B;
   --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px -14px rgba(0,0,0,.6);
 }
@@ -335,6 +337,35 @@ select.sel:focus{outline:none;border-color:var(--accent)}
 .nudge button{margin-left:auto;color:var(--muted);font-size:15px;line-height:1;padding:0 2px}
 .nudge button:hover{color:var(--text)}
 .pv-body .credit{color:var(--muted);opacity:.75}
+
+/* ---------- muted highlight: the "make something new" actions ---------- */
+.btn.muted-hl,
+.addline.muted-hl{
+  border:1px solid var(--accent-muted);
+  color:var(--accent-muted-text);
+  background:transparent;
+  transition:all .14s ease;
+}
+.btn.muted-hl:hover,
+.addline.muted-hl:hover{
+  border-color:var(--accent);
+  color:var(--accent-2);
+  background:var(--accent-soft);
+}
+.chip.muted-hl{border-color:var(--accent-muted);color:var(--accent-muted-text);background:transparent}
+.chip.muted-hl .dot{background:var(--accent-muted)}
+.chip.muted-hl:hover{border-color:var(--accent);color:var(--accent-2);background:var(--accent-soft)}
+.chip.muted-hl[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:550}
+.chip.muted-hl[aria-pressed="true"] .dot{background:rgba(255,255,255,.85)}
+
+/* ---------- empty builder (the Blank template) ---------- */
+.empty-builder{
+  border:1px dashed var(--border-strong);border-radius:var(--radius);
+  padding:30px 26px;text-align:center;background:var(--surface-2);
+}
+.empty-builder p{margin:0;font-size:13.8px;color:var(--muted);line-height:1.6}
+.empty-builder p + p{margin-top:7px;max-width:52ch;margin-left:auto;margin-right:auto}
+.empty-builder b{color:var(--text-2);font-weight:620}
 </style>
 </head>
 <body>
@@ -391,7 +422,7 @@ select.sel:focus{outline:none;border-color:var(--accent)}
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
           Add block
         </button>
-        <button class="btn btn-ghost" id="customBtn" title="Create an empty block with your own heading">Custom block</button>
+        <button class="btn muted-hl" id="customBtn" title="Create an empty block with your own heading">Custom block</button>
       </div>
       <div class="addbar" style="margin-top:10px">
         <button class="btn btn-ghost" id="exportBtn" style="flex:1">Export .json</button>
@@ -524,7 +555,8 @@ const PROFILES = [
   { id:"support",    name:"Customer Support",    blurb:"Send-ready replies, policy safety, and escalation rules." },
   { id:"education",  name:"Teaching & Tutoring", blurb:"Socratic pacing, worked steps, and understanding over answers." },
   { id:"legal",      name:"Contracts & Policy",  blurb:"Quote the text, flag the risk, and leave conclusions to a human." },
-  { id:"personal",   name:"Personal Assistant",  blurb:"Practical, low-friction help with planning, admin and everyday decisions." }
+  { id:"personal",   name:"Personal Assistant",  blurb:"Practical, low-friction help with planning, admin and everyday decisions." },
+  { id:"blank",      name:"Blank",              blurb:"Start from nothing. No sections and no preset lines \u2014 add exactly the blocks you want, in the order you want them." }
 ];
 
 const SECTIONS = [
@@ -751,6 +783,7 @@ let state = null;
 let undoState = null;
 
 function buildFromProfile(pid) {
+  if (pid === "blank") return { profile: "blank", blocks: [] };
   const blocks = SECTIONS.filter(sec => matches(sec.p, pid)).map(sec => ({
     id: uid(), sid: sec.id, title: sec.title, mode: sec.mode, hint: sec.hint,
     collapsed: false, showAll: false,
@@ -785,6 +818,7 @@ function buildText() {
     else out.push(items.map(i => "- " + i.t.trim().replace(/^[-*]\s*/, "")).join("\n"));
     out.push("");
   });
+  if (!out.length) return "";
   let txt = out.join("\n").replace(/\n{3,}/g, "\n\n").trim() + "\n";
   if (attribOn()) txt += "\n---\n" + CREDIT + "\n";
   return txt;
@@ -795,7 +829,9 @@ function renderPreview() {
   const txt = buildText();
   const blocks = state.blocks.filter(b => liveItems(b).length);
   if (!blocks.length) {
-    body.innerHTML = '<p class="pv-empty">Nothing selected yet. Tick a few lines on the left and they will appear here.</p>';
+    body.innerHTML = '<p class="pv-empty">' + (state.blocks.length
+      ? "Nothing selected yet. Tick a few lines on the left and they will appear here."
+      : "No blocks yet. Add one under the builder and it will appear here.") + "</p>";
   } else {
     let html = "";
     blocks.forEach(b => {
@@ -861,11 +897,20 @@ function render() {
         '<ul class="items">' + itemsHtml + "</ul>" +
         (hideExtras ? '<button class="addline" data-act="more">+ ' + off + " more preset option" + (off === 1 ? "" : "s") + "</button> " : "") +
         (!hideExtras && off > 3 ? '<button class="addline" data-act="less">&minus; Hide unused options</button> ' : "") +
-        '<button class="addline" data-act="additem">+ Add your own line</button>' +
+        '<button class="addline muted-hl" data-act="additem">+ Add your own line</button>' +
       "</div>";
 
     wrap.appendChild(el);
   });
+  if (!state.blocks.length) {
+    const ph = document.createElement("div");
+    ph.className = "empty-builder";
+    ph.innerHTML = "<p><b>Nothing here yet.</b></p>" +
+      "<p>Add a preset block from the dropdown below, or make a custom block with your own heading. " +
+      "Pick a profile above if you would rather start from a ready-made set.</p>";
+    wrap.appendChild(ph);
+  }
+  $("#expandBtn").style.display = state.blocks.length ? "" : "none";
   renderAddSelect();
   renderPreview();
   save();
@@ -1000,7 +1045,7 @@ $("#blocks").addEventListener("dragend", () => {
 /* ============================ PROFILES ============================ */
 function renderChips() {
   $("#profileChips").innerHTML = PROFILES.map(p =>
-    '<button class="chip" data-id="' + p.id + '" aria-pressed="' + (p.id === state.profile) + '"><span class="dot"></span>' + esc(p.name) + "</button>"
+    '<button class="chip' + (p.id === "blank" ? " muted-hl" : "") + '" data-id="' + p.id + '" aria-pressed="' + (p.id === state.profile) + '"><span class="dot"></span>' + esc(p.name) + "</button>"
   ).join("");
   const cur = PROFILES.find(p => p.id === state.profile);
   $("#profileDesc").textContent = cur
@@ -1030,7 +1075,9 @@ $("#addBtn").addEventListener("click", () => {
   state.blocks.push({
     id: uid(), sid: sec.id, title: sec.title, mode: sec.mode, hint: sec.hint,
     collapsed: false, showAll: true,
-    items: ITEMS.filter(i => i.s === sec.id).map(i => ({ id: uid(), t: i.t, on: matches(i.p, state.profile) }))
+    items: ITEMS.filter(i => i.s === sec.id).map(i => ({
+      id: uid(), t: i.t, on: state.profile === "blank" ? false : matches(i.p, state.profile)
+    }))
   });
   render();
   const el = $('.block[data-id="' + state.blocks[state.blocks.length - 1].id + '"]');
