@@ -7,11 +7,11 @@
 Pick a use-case profile, toggle the rule blocks you want, edit anything inline,
 then generate a clean `.txt` file to paste into your Claude project's custom instructions.
 
-[![Live demo](https://img.shields.io/badge/try_it-claudeinstruct.surge.sh-C96442?style=flat-square&labelColor=1F1E1D)](https://claudeinstruct.surge.sh/?utm_source=github&utm_medium=readme&utm_campaign=badge)
+[![Live demo](https://img.shields.io/badge/try_it-claudeinstruct.surge.sh-C96442?style=flat-square&labelColor=1F1E1D)](https://claudeinstruct.surge.sh)
 [![License](https://img.shields.io/badge/license-MIT-C96442?style=flat-square&labelColor=1F1E1D)](LICENSE)
 ![Dependencies](https://img.shields.io/badge/dependencies-none-C96442?style=flat-square&labelColor=1F1E1D)
 
-### **[Open the app →](https://claudeinstruct.surge.sh/?utm_source=github&utm_medium=readme&utm_campaign=hero)**
+### **[Open the app →](https://claudeinstruct.surge.sh)**
 
 Free, no sign-up, runs entirely in your browser.
 
@@ -20,7 +20,7 @@ Free, no sign-up, runs entirely in your browser.
 <br>
 
 <p align="center">
-  <a href="https://claudeinstruct.surge.sh/?utm_source=github&utm_medium=readme&utm_campaign=demo">
+  <a href="https://claudeinstruct.surge.sh">
     <img src="docs/demo.gif" alt="Choosing the Software Development profile, toggling rule blocks, and generating a project instructions text file" width="860">
   </a>
 </p>
@@ -82,7 +82,7 @@ Anything in `[square brackets]` is a placeholder you fill in. The preview pane h
 
 <div align="center">
 
-**[Build your own set →](https://claudeinstruct.surge.sh/?utm_source=github&utm_medium=readme&utm_campaign=sample)**
+**[Build your own set →](https://claudeinstruct.surge.sh)**
 
 </div>
 
@@ -95,7 +95,6 @@ Anything in `[square brackets]` is a placeholder you fill in. The preview pane h
 - Live preview with word count, character count and an unfilled-placeholder counter
 - **Generate .txt** download and **Copy** to clipboard (`Ctrl`/`Cmd`+`S` also generates)
 - Autosaves to `localStorage`; **Export / Import .json** to move a config between machines
-- Shareable profile links — `?profile=dev` loads the Software Development preset
 - Light and dark themes, following your system preference by default
 - Responsive down to phone width
 
@@ -156,7 +155,7 @@ Anything in `[square brackets]` is a placeholder you fill in. The preview pane h
 
 ### Ready to write a set?
 
-**[claudeinstruct.surge.sh →](https://claudeinstruct.surge.sh/?utm_source=github&utm_medium=readme&utm_campaign=footer)**
+**[claudeinstruct.surge.sh →](https://claudeinstruct.surge.sh)**
 
 If it saves you some typing, you can [buy me a coffee](https://www.buymeacoffee.com/donliggett).
 

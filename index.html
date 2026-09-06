@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Claude Instruct — Project Instructions Generator</title>
+<title>Claude Instruct — Project Instructions Generator for Claude AI</title>
 <meta name="description" content="Build clean, structured project instructions for Claude AI. Pick a use-case profile, toggle proven rule blocks, add your own, and generate a text file to paste straight into your Claude project.">
 <link rel="canonical" href="https://claudeinstruct.surge.sh/">
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
@@ -487,7 +487,7 @@ select.sel:focus{outline:none;border-color:var(--accent)}
           </details>
           <details>
             <summary>Does Claude Instruct send my data anywhere?</summary>
-            <p>Your instructions never leave your browser. There is no account, no upload and no server-side storage — everything you type is kept in local storage on your own device, and you can export it as JSON at any time. The page does load Cloudflare Web Analytics, a cookieless script that counts anonymous page views so I can see whether anyone is using this. Nothing you type is ever part of that.</p>
+            <p>No. There is no account, no upload, no server-side storage and no analytics of any kind — the page makes no network requests at all once it has loaded. Everything you type is kept in local storage on your own device, and you can export it as JSON whenever you want a copy you control.</p>
           </details>
         </div>
       </div>
@@ -1013,14 +1013,14 @@ $("#profileChips").addEventListener("click", e => {
   if (pid === state.profile) return;
   undoState = JSON.parse(JSON.stringify(state));
   state = buildFromProfile(pid);
-  renderChips(); render(); syncUrlAndTitle();
+  renderChips(); render();
   const name = (PROFILES.find(p => p.id === pid) || {}).name;
   toast("Loaded the " + name + " profile", "Undo", restoreUndo);
 });
 function restoreUndo() {
   if (!undoState) return;
   state = undoState; undoState = null;
-  renderChips(); render(); syncUrlAndTitle();
+  renderChips(); render();
 }
 
 /* ============================ ADD BLOCKS ============================ */
@@ -1172,30 +1172,11 @@ document.addEventListener("keydown", e => {
   if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s") { e.preventDefault(); $("#genBtn").click(); }
 });
 
-/* ============================ DEEP LINKS ============================ */
-const BASE_TITLE = "Claude Instruct \u2014 Project Instructions Generator for Claude AI";
-function syncUrlAndTitle() {
-  const p = PROFILES.find(x => x.id === state.profile);
-  document.title = (p && p.id !== "general")
-    ? p.name + " project instructions \u2014 Claude Instruct"
-    : BASE_TITLE;
-  try {
-    const url = state.profile === "general"
-      ? location.pathname
-      : location.pathname + "?profile=" + encodeURIComponent(state.profile);
-    history.replaceState(null, "", url + location.hash);
-  } catch (e) {}
-}
-
 /* ============================ INIT ============================ */
 setTheme(document.documentElement.getAttribute("data-theme") || "light");
-let qp = null;
-try { qp = new URLSearchParams(location.search).get("profile"); } catch (e) {}
-if (qp && PROFILES.some(p => p.id === qp)) state = buildFromProfile(qp);
-else state = load() || buildFromProfile("general");
+state = load() || buildFromProfile("general");
 renderChips();
 render();
-syncUrlAndTitle();
 </script>
 <script type="application/ld+json">
 {
@@ -1288,7 +1269,7 @@ syncUrlAndTitle();
      "name": "Does Claude Instruct send my data anywhere?",
      "acceptedAnswer": {
       "@type": "Answer",
-      "text": "Your instructions never leave your browser. There is no account, no upload and no server-side storage — everything you type is kept in local storage on your own device, and you can export it as JSON at any time. The page does load Cloudflare Web Analytics, a cookieless script that counts anonymous page views so I can see whether anyone is using this. Nothing you type is ever part of that."
+      "text": "No. There is no account, no upload, no server-side storage and no analytics of any kind — the page makes no network requests at all once it has loaded. Everything you type is kept in local storage on your own device, and you can export it as JSON whenever you want a copy you control."
      }
     }
    ]
@@ -1296,12 +1277,5 @@ syncUrlAndTitle();
  ]
 }
 </script>
-<!-- Cloudflare Web Analytics.
-     This does nothing until the token below is real: create the site at
-     Cloudflare dashboard > Web Analytics > Add a site, then paste the beacon
-     token here. Cookieless, no personal data, no consent banner required.
-     If you remove this script, also soften the privacy answer in the FAQ
-     above and in the JSON-LD block, which both mention it. -->
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "REPLACE_WITH_YOUR_BEACON_TOKEN"}'></script>
 </body>
 </html>

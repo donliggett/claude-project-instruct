@@ -39,24 +39,6 @@ const ITEMS    = [ { s: sectionId, p: profiles | "*", t: "the line of instructio
 
 `p` is either `"*"` (applies to every profile) or an array of profile ids. Add a line to `ITEMS`, reload, done.
 
-## Analytics
-
-The page loads **Cloudflare Web Analytics** from a snippet just before `</body>`. It is cookieless, collects no personal data and needs no consent banner.
-
-**It does nothing until you paste a real beacon token.** Create the site at Cloudflare dashboard → Web Analytics → Add a site (the site does not need to be proxied through Cloudflare), then replace `REPLACE_WITH_YOUR_BEACON_TOKEN` in `index.html`.
-
-Every README link carries UTM parameters, so campaigns are separable in whatever tool reads them:
-
-| Link | Campaign |
-| --- | --- |
-| Header badge | `badge` |
-| "Open the app" | `hero` |
-| The demo GIF | `demo` |
-| After the sample output | `sample` |
-| Closing CTA | `footer` |
-
-If you remove the analytics script, soften the privacy answer in the on-page FAQ **and** the matching answer in the JSON-LD block — both currently say the script is there.
-
 ## Attribution line
 
 Generated files end with a separator and one credit line:
@@ -73,7 +55,6 @@ A checkbox under the Generate button turns it off, and the choice is remembered 
 - Canonical, Open Graph and Twitter tags point at `https://claudeinstruct.surge.sh/`. If the domain changes, update them in `<head>`, plus `sitemap.xml`, `robots.txt`, `CNAME`, and the `@id`/`url` fields in the JSON-LD.
 - `application/ld+json` at the end of `<body>` carries **WebApplication** and **FAQPage** schema. The FAQ answers there mirror the visible FAQ — edit one, edit both, or the rich result gets suppressed.
 - Roughly 590 words render without JavaScript (the explainer, the anatomy list and the FAQ), so the page is indexable by crawlers that do not execute scripts.
-- `?profile=` variants are consolidated under the root by the canonical tag, so they do not compete with each other in search.
 
 ## localStorage keys
 
