@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude Instruct — Project Instructions Generator</title>
+<meta name="description" content="Build clean, structured project instructions for Claude AI. Pick a use-case profile, toggle proven rule blocks, add your own, and generate a text file to paste straight into your Claude project.">
+<link rel="canonical" href="https://claudeinstruct.surge.sh/">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Don Liggett">
+<meta name="theme-color" content="#C96442" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1B1A19" media="(prefers-color-scheme: dark)">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Claude Instruct">
+<meta property="og:url" content="https://claudeinstruct.surge.sh/">
+<meta property="og:title" content="Claude Instruct — Project Instructions Generator for Claude AI">
+<meta property="og:description" content="Pick a use-case profile, toggle proven rule blocks, edit anything inline, and generate a text file to paste straight into your Claude project instructions. Free, open source, runs entirely in your browser.">
+<meta property="og:image" content="https://claudeinstruct.surge.sh/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Claude Instruct — write project instructions Claude actually follows.">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Claude Instruct — Project Instructions Generator for Claude AI">
+<meta name="twitter:description" content="Pick a use-case profile, toggle proven rule blocks, and generate a text file to paste straight into your Claude project instructions.">
+<meta name="twitter:image" content="https://claudeinstruct.surge.sh/og.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23C96442'/%3E%3Cg stroke='%23F5F4EE' stroke-width='9' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M40 24H30a6 6 0 0 0-6 6v40a6 6 0 0 0 6 6h10'/%3E%3Cpath d='M60 24h10a6 6 0 0 1 6 6v40a6 6 0 0 1-6 6H60'/%3E%3C/g%3E%3C/svg%3E">
+<style>
+:root{
+  color-scheme: light;
+  --bg:#F5F4EE; --surface:#FFFFFF; --surface-2:#FAF9F5; --surface-3:#EFEDE4;
+  --border:#E2DFD4; --border-strong:#D3CFC2;
+  --text:#1F1E1D; --text-2:#4A4741; --muted:#7C776E;
+  --accent:#C96442; --accent-2:#B0553A; --accent-soft:#F6E7E0;
+  --ok:#5B7F5B; --warn:#A6772B;
+  --shadow:0 1px 2px rgba(31,30,29,.05), 0 8px 24px -12px rgba(31,30,29,.18);
+  --radius:14px;
+  --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,ui-serif,serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#1B1A19; --surface:#252422; --surface-2:#2C2B28; --surface-3:#343330;
+  --border:#3A3936; --border-strong:#4A4844;
+  --text:#F0EEE6; --text-2:#D6D2C6; --muted:#948F84;
+  --accent:#D97757; --accent-2:#E38A6D; --accent-soft:#3A2A23;
+  --ok:#8FB98F; --warn:#D6A75B;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px -14px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--text); font-family:var(--sans);
+  font-size:15px; line-height:1.55; -webkit-font-smoothing:antialiased;
+  transition:background .2s ease,color .2s ease;
+}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+button{font-family:inherit;font-size:inherit;cursor:pointer;border:0;background:none;color:inherit}
+::selection{background:var(--accent-soft);color:var(--text)}
+
+/* ---------- top bar ---------- */
+.topbar{
+  position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--bg) 88%,transparent);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--border);
+}
+.topbar-in{max-width:1420px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:14px}
+.wordmark{display:flex;align-items:center;gap:10px;font-weight:650;letter-spacing:-.01em}
+.logo{width:26px;height:26px;border-radius:7px;background:var(--accent);display:grid;place-items:center;flex:none}
+.logo svg{width:15px;height:15px}
+.wordmark small{display:block;font-weight:450;font-size:11.5px;color:var(--muted);letter-spacing:0}
+.spacer{flex:1}
+.iconbtn{
+  width:34px;height:34px;border-radius:9px;display:grid;place-items:center;color:var(--text-2);
+  border:1px solid transparent;transition:background .15s,border-color .15s,color .15s;
+}
+.iconbtn:hover{background:var(--surface-3);color:var(--text);border-color:var(--border)}
+.iconbtn svg{width:17px;height:17px}
+
+/* ---------- hero ---------- */
+.hero{max-width:1420px;margin:0 auto;padding:38px 20px 6px}
+.hero h1{
+  font-family:var(--serif);font-weight:500;letter-spacing:-.02em;
+  font-size:clamp(30px,4.6vw,46px);line-height:1.08;margin:0 0 10px;
+}
+.hero h1 em{font-style:italic;color:var(--accent)}
+.hero p.lede{margin:0;max-width:62ch;color:var(--text-2);font-size:16px}
+.steps{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px;font-size:12.5px;color:var(--muted)}
+.steps span{display:inline-flex;align-items:center;gap:6px}
+.steps b{font-weight:600;color:var(--text-2)}
+.steps i{font-style:normal;opacity:.45}
+
+/* ---------- profile picker ---------- */
+.panel{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:var(--shadow);
+}
+.picker{max-width:1420px;margin:24px auto 0;padding:0 20px}
+.picker .panel{padding:18px}
+.picker h2{margin:0 0 3px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:650}
+.picker p{margin:0 0 14px;font-size:13.5px;color:var(--text-2)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{
+  border:1px solid var(--border-strong);border-radius:999px;padding:7px 13px;font-size:13.5px;
+  background:var(--surface-2);color:var(--text-2);display:inline-flex;align-items:center;gap:7px;
+  transition:all .14s ease;
+}
+.chip:hover{border-color:var(--accent);color:var(--text)}
+.chip .dot{width:6px;height:6px;border-radius:50%;background:var(--border-strong);flex:none;transition:background .14s}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:550}
+.chip[aria-pressed="true"] .dot{background:rgba(255,255,255,.85)}
+
+/* ---------- app grid ---------- */
+.app{
+  max-width:1420px;margin:22px auto 0;padding:0 20px 120px;
+  display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);gap:22px;align-items:start;
+}
+.col-head{display:flex;align-items:center;gap:10px;margin:0 2px 12px}
+.col-head h2{margin:0;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:650}
+.col-head .rule{flex:1;height:1px;background:var(--border)}
+
+/* ---------- blocks ---------- */
+.blocks{display:flex;flex-direction:column;gap:12px}
+.block{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:var(--shadow);overflow:hidden;transition:border-color .15s,opacity .15s,box-shadow .15s;
+}
+.block.dragging{opacity:.4}
+.block.drop-before{box-shadow:0 -3px 0 0 var(--accent),var(--shadow)}
+.block.drop-after{box-shadow:0 3px 0 0 var(--accent),var(--shadow)}
+.block-h{display:flex;align-items:center;gap:9px;padding:12px 13px;user-select:none}
+.grip{
+  cursor:grab;color:var(--muted);opacity:.6;padding:2px 1px;line-height:1;flex:none;
+  font-size:14px;letter-spacing:-2px;touch-action:none;
+}
+.grip:active{cursor:grabbing}
+.block-h h3{margin:0;font-size:15px;font-weight:620;letter-spacing:-.01em;flex:1;min-width:0}
+.block-h h3[contenteditable="true"]{outline:none;border-bottom:1px dashed var(--border-strong)}
+.tally{
+  font-size:11.5px;font-variant-numeric:tabular-nums;color:var(--muted);background:var(--surface-3);
+  border-radius:999px;padding:2px 8px;flex:none;
+}
+.tally.on{background:var(--accent-soft);color:var(--accent-2)}
+:root[data-theme="dark"] .tally.on{color:var(--accent)}
+.block-h .iconbtn{width:28px;height:28px;border-radius:7px}
+.block-h .iconbtn svg{width:14px;height:14px}
+.caret{transition:transform .18s ease}
+.block.collapsed .caret{transform:rotate(-90deg)}
+.block.collapsed .block-b{display:none}
+.block-b{padding:0 13px 12px}
+.hint{margin:-4px 0 11px 26px;font-size:12.5px;color:var(--muted);max-width:64ch}
+.items{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.item{display:flex;align-items:flex-start;gap:9px;padding:6px 7px;border-radius:9px;transition:background .12s}
+.item:hover{background:var(--surface-2)}
+.item .box{
+  appearance:none;width:16px;height:16px;margin:3px 0 0;flex:none;border-radius:5px;cursor:pointer;
+  border:1.5px solid var(--border-strong);background:var(--surface);transition:all .14s;
+}
+.item .box:hover{border-color:var(--accent)}
+.item .box:checked{background:var(--accent);border-color:var(--accent)}
+.item .box:checked::after{content:"";display:block;width:4px;height:8px;margin:1px auto 0;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(43deg)}
+.item .txt{
+  flex:1;min-width:0;font-size:13.7px;line-height:1.5;color:var(--text-2);outline:none;
+  border-radius:6px;padding:1px 3px;margin:-1px -3px;white-space:pre-wrap;word-break:break-word;
+}
+.item .box:checked ~ .txt{color:var(--text)}
+.item .txt:focus{background:var(--surface-3);box-shadow:inset 0 0 0 1px var(--border-strong)}
+.item .txt:empty::before{content:"Type your own line…";color:var(--muted)}
+.item .kill{opacity:0;flex:none;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;color:var(--muted);font-size:13px}
+.item:hover .kill,.item .kill:focus{opacity:1}
+.item .kill:hover{background:var(--surface-3);color:var(--accent)}
+.ph{background:var(--accent-soft);color:var(--accent-2);border-radius:4px;padding:0 3px;font-weight:520}
+:root[data-theme="dark"] .ph{color:var(--accent)}
+.addline{
+  margin:8px 0 0 26px;font-size:12.8px;color:var(--muted);border:1px dashed var(--border-strong);
+  border-radius:8px;padding:5px 11px;transition:all .14s;
+}
+.addline:hover{color:var(--accent);border-color:var(--accent);background:var(--surface-2)}
+
+/* ---------- add block bar ---------- */
+.addbar{display:flex;gap:9px;margin-top:14px;flex-wrap:wrap}
+select.sel{
+  flex:1;min-width:190px;appearance:none;background:var(--surface);color:var(--text);
+  border:1px solid var(--border-strong);border-radius:10px;padding:9px 34px 9px 12px;font-size:13.5px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237C776E' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 11px center;background-size:14px;
+}
+select.sel:focus{outline:none;border-color:var(--accent)}
+.btn{
+  border-radius:10px;padding:9px 15px;font-size:13.5px;font-weight:550;display:inline-flex;
+  align-items:center;justify-content:center;gap:7px;transition:all .14s ease;white-space:nowrap;
+}
+.btn svg{width:15px;height:15px;flex:none}
+.btn-ghost{border:1px solid var(--border-strong);background:var(--surface);color:var(--text-2)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);background:var(--surface-2)}
+.btn-solid{background:var(--accent);color:#fff;box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.btn-solid:hover{background:var(--accent-2)}
+.btn-coffee{background:#FFDD00;color:#0D0C0B;font-weight:650}
+.btn-coffee:hover{filter:brightness(.94)}
+
+/* ---------- preview ---------- */
+.preview-col{position:sticky;top:74px}
+.preview{display:flex;flex-direction:column;max-height:calc(100vh - 116px);overflow:hidden}
+.pv-head{display:flex;align-items:center;gap:9px;padding:12px 14px;border-bottom:1px solid var(--border);flex:none}
+.pv-head h3{margin:0;font-size:13.5px;font-weight:620;flex:1}
+.stat{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.stat b{color:var(--text-2);font-weight:600}
+.stat.warn b{color:var(--warn)}
+.pv-body{
+  flex:1;overflow:auto;padding:16px 18px;margin:0;font-family:var(--mono);font-size:12.6px;
+  line-height:1.72;white-space:pre-wrap;word-break:break-word;color:var(--text-2);background:var(--surface-2);
+}
+.pv-body h4{
+  font-family:var(--sans);font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--accent);margin:20px 0 6px;font-weight:680;
+}
+.pv-body h4:first-child{margin-top:0}
+.pv-empty{color:var(--muted);font-family:var(--sans);font-size:13.5px;font-style:italic}
+.pv-foot{flex:none;padding:12px 14px;border-top:1px solid var(--border);display:flex;gap:9px;flex-wrap:wrap;background:var(--surface)}
+.pv-foot .btn{flex:1;min-width:112px}
+.pv-note{width:100%;margin:2px 0 0;font-size:11.5px;color:var(--muted);text-align:center}
+
+/* ---------- toast ---------- */
+.toast{
+  position:fixed;left:50%;bottom:26px;transform:translate(-50%,16px);z-index:90;
+  background:var(--text);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:13.5px;
+  font-weight:550;opacity:0;pointer-events:none;transition:all .22s ease;box-shadow:var(--shadow);
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ---------- footer ---------- */
+.foot{
+  max-width:1420px;margin:0 auto;padding:26px 20px 44px;border-top:1px solid var(--border);
+  display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:12.5px;color:var(--muted);
+}
+.foot .spacer{flex:1}
+
+/* mobile preview toggle */
+.jump{
+  display:none;position:fixed;right:16px;bottom:18px;z-index:60;border-radius:999px;
+  padding:11px 18px;background:var(--accent);color:#fff;font-weight:600;font-size:13.5px;
+  box-shadow:0 6px 20px -6px rgba(0,0,0,.4);gap:8px;align-items:center;
+}
+.jump svg{width:15px;height:15px}
+
+@media (max-width:1000px){
+  .app{grid-template-columns:1fr;gap:26px}
+  .preview-col{position:static}
+  .preview{max-height:none}
+  .pv-body{max-height:60vh}
+  .jump{display:inline-flex}
+  .hero{padding-top:26px}
+}
+@media (max-width:560px){
+  .topbar-in,.hero,.picker,.app,.foot{padding-left:14px;padding-right:14px}
+  .wordmark small{display:none}
+  .block-b{padding:0 9px 11px}
+  .hint{margin-left:0}
+  .addline{margin-left:0}
+  .pv-foot .btn{min-width:0;flex:1 1 100%}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ---------- static content / SEO section ---------- */
+.content{max-width:1420px;margin:0 auto;padding:8px 20px 20px}
+.content .panel{padding:32px clamp(20px,4vw,46px);max-width:none}
+.prose{max-width:74ch;margin:0 auto}
+.prose h2{
+  font-family:var(--serif);font-weight:500;letter-spacing:-.015em;
+  font-size:clamp(22px,2.6vw,29px);line-height:1.2;margin:44px 0 12px;
+}
+.prose h2:first-child{margin-top:0}
+.prose h3{font-size:15.5px;font-weight:640;margin:26px 0 5px;letter-spacing:-.005em}
+.prose p{margin:0 0 14px;color:var(--text-2);font-size:15px;line-height:1.65}
+.prose ol.anatomy{margin:0;padding:0;list-style:none;counter-reset:an}
+.prose ol.anatomy li{
+  counter-increment:an;position:relative;padding:9px 0 9px 40px;
+  border-top:1px solid var(--border);font-size:14.5px;color:var(--text-2);
+}
+.prose ol.anatomy li::before{
+  content:counter(an,decimal-leading-zero);position:absolute;left:0;top:10px;
+  font-family:var(--mono);font-size:11.5px;color:var(--accent);font-weight:600;
+}
+.prose ol.anatomy li b{color:var(--text);font-weight:640}
+.faq{margin-top:6px}
+.faq details{border-top:1px solid var(--border);padding:2px 0}
+.faq details[open]{padding-bottom:8px}
+.faq summary{
+  list-style:none;cursor:pointer;padding:13px 30px 13px 0;position:relative;
+  font-size:15px;font-weight:600;color:var(--text);
+}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{
+  content:"";position:absolute;right:6px;top:19px;width:8px;height:8px;
+  border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);
+  transform:rotate(45deg);transition:transform .18s ease;
+}
+.faq details[open] summary::after{transform:rotate(-135deg);top:22px}
+.faq details p{margin:0 0 12px;font-size:14.5px}
+.noscript{
+  max-width:1420px;margin:16px auto 0;padding:0 20px;
+}
+.noscript div{
+  background:var(--accent-soft);border:1px solid var(--accent);border-radius:var(--radius);
+  padding:14px 18px;font-size:14px;color:var(--text);
+}
+@media (max-width:560px){
+  .content{padding-left:14px;padding-right:14px}
+  .content .panel{padding:22px 16px}
+}
+
+/* ---------- attribution toggle + coffee nudge ---------- */
+.attrib{
+  width:100%;display:flex;align-items:center;gap:8px;margin-top:4px;
+  font-size:11.8px;color:var(--muted);cursor:pointer;user-select:none;
+}
+.attrib input{
+  appearance:none;width:14px;height:14px;flex:none;border-radius:4px;cursor:pointer;
+  border:1.5px solid var(--border-strong);background:var(--surface);transition:all .14s;
+}
+.attrib input:hover{border-color:var(--accent)}
+.attrib input:checked{background:var(--accent);border-color:var(--accent)}
+.attrib input:checked::after{content:"";display:block;width:3px;height:7px;margin:1px auto 0;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(43deg)}
+.attrib:hover{color:var(--text-2)}
+.nudge{
+  width:100%;display:none;align-items:center;gap:8px;margin-top:8px;padding:9px 12px;
+  border-radius:9px;background:var(--accent-soft);border:1px solid var(--border);
+  font-size:12.5px;color:var(--text-2);
+}
+.nudge.show{display:flex}
+.nudge a{font-weight:600;color:var(--accent-2)}
+:root[data-theme="dark"] .nudge a{color:var(--accent)}
+.nudge button{margin-left:auto;color:var(--muted);font-size:15px;line-height:1;padding:0 2px}
+.nudge button:hover{color:var(--text)}
+.pv-body .credit{color:var(--muted);opacity:.75}
+</style>
+</head>
+<body>
+<script>(function(){try{var t=localStorage.getItem("cpi.theme");if(!t)t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="wordmark">
+      <span class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3"/><path d="M14 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/></svg>
+      </span>
+      <span>Claude Instruct<small>Project instructions generator</small></span>
+    </div>
+    <span class="spacer"></span>
+    <button class="iconbtn" id="themeBtn" title="Toggle theme" aria-label="Toggle colour theme"></button>
+    <a class="iconbtn" id="repoLink" href="https://github.com/donliggett/claude-project-instruct" target="_blank" rel="noopener" title="View on GitHub" aria-label="View on GitHub">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.7.5.6 5.6.6 11.9c0 5 3.3 9.3 7.8 10.8.6.1.8-.2.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.1.1 1.7 1.1 1.7 1.1 1 1.8 2.7 1.3 3.4 1 .1-.7.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.5-2.3 1.2-3.2-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0c2.2-1.5 3.2-1.2 3.2-1.2.6 1.6.2 2.8.1 3.1.8.9 1.2 1.9 1.2 3.2 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.3c0 .4.2.7.8.6 4.6-1.5 7.8-5.8 7.8-10.8C23.4 5.6 18.3.5 12 .5Z"/></svg>
+    </a>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <h1>Write project instructions<br>Claude actually <em>follows</em>.</h1>
+    <p class="lede">Pick a use-case profile, toggle the rule blocks you want, edit anything inline, then generate a clean text file to paste into your Claude project's custom instructions.</p>
+    <div class="steps">
+      <span><b>1.</b> Choose a profile</span><i>/</i>
+      <span><b>2.</b> Tune the blocks</span><i>/</i>
+      <span><b>3.</b> Fill the [brackets]</span><i>/</i>
+      <span><b>4.</b> Generate</span>
+    </div>
+  </section>
+
+  <noscript><div class="noscript"><div>The builder needs JavaScript to run. The structure it produces is described in full below — scroll down for the anatomy of a Claude project instruction set.</div></div></noscript>
+
+  <section class="picker">
+    <div class="panel">
+      <h2>Start with a profile</h2>
+      <p id="profileDesc">Each profile pre-selects the sections and rules that matter most for that kind of work. Nothing is locked — every line stays editable.</p>
+      <div class="chips" id="profileChips" role="group" aria-label="Use-case profiles"></div>
+    </div>
+  </section>
+
+  <div class="app">
+    <div class="builder-col">
+      <div class="col-head">
+        <h2>Builder</h2><span class="rule"></span>
+        <button class="btn btn-ghost" id="expandBtn" style="padding:5px 11px;font-size:12.5px">Collapse all</button>
+      </div>
+      <div class="blocks" id="blocks"></div>
+      <div class="addbar">
+        <select class="sel" id="addSelect" aria-label="Add a block"></select>
+        <button class="btn btn-ghost" id="addBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          Add block
+        </button>
+        <button class="btn btn-ghost" id="customBtn" title="Create an empty block with your own heading">Custom block</button>
+      </div>
+      <div class="addbar" style="margin-top:10px">
+        <button class="btn btn-ghost" id="exportBtn" style="flex:1">Export .json</button>
+        <button class="btn btn-ghost" id="importBtn" style="flex:1">Import .json</button>
+        <button class="btn btn-ghost" id="resetBtn" style="flex:1">Reset</button>
+        <input type="file" id="importFile" accept="application/json,.json" hidden>
+      </div>
+    </div>
+
+    <div class="preview-col" id="previewCol">
+      <div class="col-head">
+        <h2>Preview</h2><span class="rule"></span>
+      </div>
+      <div class="panel preview">
+        <div class="pv-head">
+          <h3>project-instructions.txt</h3>
+          <span class="stat" id="statWords"></span>
+          <span class="stat" id="statChars"></span>
+          <span class="stat" id="statPh"></span>
+        </div>
+        <div class="pv-body" id="pvBody"></div>
+        <div class="pv-foot">
+          <button class="btn btn-ghost" id="copyBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy
+          </button>
+          <button class="btn btn-solid" id="genBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M20 21H4"/></svg>
+            Generate .txt
+          </button>
+          <a class="btn btn-coffee" id="bmcBtn" href="https://www.buymeacoffee.com/donliggett" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4Z"/><path d="M6 2v3M10 2v3M14 2v3"/></svg>
+            Buy me a coffee
+          </a>
+          <label class="attrib"><input type="checkbox" id="attribBox" checked>Add a one-line credit at the end of the file</label>
+          <p class="pv-note">Saved automatically in this browser. Your instructions never leave your device.</p>
+          <div class="nudge" id="nudge">
+            <span>Saved you some typing? <a href="https://www.buymeacoffee.com/donliggett" target="_blank" rel="noopener">Buy me a coffee</a>.</span>
+            <button id="nudgeX" title="Dismiss" aria-label="Dismiss">&times;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="content" id="about">
+    <div class="panel">
+      <div class="prose">
+        <h2>What are Claude project instructions?</h2>
+        <p>A Claude project is a workspace that holds a knowledge base and a set of custom instructions. Those instructions are prepended to every conversation inside the project, so they are the one place you can set Claude's role, rules, format and tone once instead of re-explaining them in every chat.</p>
+        <p>Most instruction sets underperform for the same three reasons: they are vague ("be professional" gives Claude nothing to act on), they omit the prohibitions, and they never say what the knowledge base already covers. Claude Instruct starts you from a structure that addresses all three, with roughly 150 pre-written lines you can toggle, edit or replace.</p>
+
+        <h2>The anatomy of a good instruction set</h2>
+        <p>These are the fourteen blocks this generator builds from. You will not need all of them — a focused page of specific rules beats five pages of general ones.</p>
+        <ol class="anatomy">
+          <li><b>Role &amp; Mission</b> — who Claude is in this project. The single highest-leverage line in the document.</li>
+          <li><b>Project Context</b> — what the project is, what stage it is at, and what the knowledge base holds.</li>
+          <li><b>Audience</b> — who the output is ultimately for. Sets vocabulary, depth and formality.</li>
+          <li><b>Objectives &amp; Success Criteria</b> — what to optimise for when two good things conflict.</li>
+          <li><b>How to Approach a Task</b> — the process: check the knowledge base, plan, ask, then execute.</li>
+          <li><b>Always</b> — positive rules concrete enough that you could check whether they were followed.</li>
+          <li><b>Never</b> — the Do-NOT list, and usually the most effective section in the whole document.</li>
+          <li><b>Output Format</b> — length, structure, code blocks, tables, citations, next steps.</li>
+          <li><b>Tone &amp; Voice</b> — how it should sound. Specific beats polite.</li>
+          <li><b>Sources &amp; Evidence</b> — sourcing rules, and the line between evidence and interpretation.</li>
+          <li><b>Uncertainty &amp; Escalation</b> — explicit permission to say "I don't know", which is what makes everything else trustworthy.</li>
+          <li><b>Glossary &amp; Naming</b> — your terms, product names, stack and metric definitions.</li>
+          <li><b>Scope &amp; Boundaries</b> — what is off-limits, out of scope, or needs a human first.</li>
+          <li><b>Examples of Good Output</b> — one good sample and one bad one teaches more than ten rules.</li>
+        </ol>
+
+        <h2>Frequently asked questions</h2>
+        <div class="faq">
+          <details open>
+            <summary>Where do I paste the generated file?</summary>
+            <p>Open your project in the Claude app and find the project instructions panel in the project sidebar, then paste the whole file in. The instructions apply to every new conversation you start inside that project.</p>
+          </details>
+          <details>
+            <summary>How long should project instructions be?</summary>
+            <p>Shorter than you think. For most projects, somewhere between 200 and 600 words of specific, checkable rules works better than several pages of general guidance — every extra line competes for attention with the ones that matter. The character counter in the preview pane flags anything over about 9,000 characters so you can trim before you paste.</p>
+          </details>
+          <details>
+            <summary>What is the difference between project instructions, a system prompt, and CLAUDE.md?</summary>
+            <p>They are the same idea delivered in three places. Project instructions apply to every chat inside one Claude project. A system prompt is passed per request through the API. CLAUDE.md is the file Claude Code reads from a repository. The structure this generator produces works in all three — the output is plain text, so you can paste it wherever your setup expects it.</p>
+          </details>
+          <details>
+            <summary>Why does the "Never" list matter so much?</summary>
+            <p>Prohibitions are concrete in a way that aspirations are not. "Never invent statistics or citations" is something a model can check its own draft against; "be accurate" is not. If you only write two sections, write Role and Never.</p>
+          </details>
+          <details>
+            <summary>What are the square brackets in the generated text?</summary>
+            <p>They are placeholders you are meant to fill in, like [project name] or [test framework]. The preview pane highlights every one and keeps a running count so nothing ships half-written. Instructions full of unreplaced placeholders are worse than none at all.</p>
+          </details>
+          <details>
+            <summary>Does Claude Instruct send my data anywhere?</summary>
+            <p>Your instructions never leave your browser. There is no account, no upload and no server-side storage — everything you type is kept in local storage on your own device, and you can export it as JSON at any time. The page does load Cloudflare Web Analytics, a cookieless script that counts anonymous page views so I can see whether anyone is using this. Nothing you type is ever part of that.</p>
+          </details>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span>Claude Instruct — an open-source project instructions generator.</span>
+    <span class="spacer"></span>
+    <a href="https://github.com/donliggett/claude-project-instruct" target="_blank" rel="noopener">Source</a>
+    <a href="https://support.claude.com/en/articles/9517075-what-are-projects" target="_blank" rel="noopener">About Claude Projects</a>
+  </footer>
+</main>
+
+<button class="jump" id="jumpBtn">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg>
+  Preview
+</button>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+"use strict";
+
+/* ============================ DATA ============================ */
+
+const PROFILES = [
+  { id:"general",    name:"General Assistant",   blurb:"A capable all-rounder. Balanced rules for thinking, drafting and answering." },
+  { id:"dev",        name:"Software Development",blurb:"Code conventions, testing, scope discipline and safe handling of secrets." },
+  { id:"writing",    name:"Content & Editorial", blurb:"Voice consistency, drafting passes, and clean prose you can publish." },
+  { id:"research",   name:"Research & Analysis", blurb:"Primary sources, verification, and a hard line between evidence and inference." },
+  { id:"consulting", name:"Client & Consulting", blurb:"Deliverable structure, confidentiality, scope control and decision framing." },
+  { id:"data",       name:"Data & Analytics",    blurb:"Show the query, state the caveats, never dress an estimate up as a measurement." },
+  { id:"marketing",  name:"Marketing & Growth",  blurb:"On-brand copy, a clear reader action, and no hype filler." },
+  { id:"product",    name:"Product Management",  blurb:"Tradeoffs, constraints, decisions and crisp next steps." },
+  { id:"support",    name:"Customer Support",    blurb:"Send-ready replies, policy safety, and escalation rules." },
+  { id:"education",  name:"Teaching & Tutoring", blurb:"Socratic pacing, worked steps, and understanding over answers." },
+  { id:"legal",      name:"Contracts & Policy",  blurb:"Quote the text, flag the risk, and leave conclusions to a human." },
+  { id:"personal",   name:"Personal Assistant",  blurb:"Practical, low-friction help with planning, admin and everyday decisions." }
+];
+
+const SECTIONS = [
+  { id:"role",        title:"Role & Mission",             mode:"prose", p:"*",
+    hint:"Who Claude is inside this project. The single highest-leverage line in the whole document." },
+  { id:"context",     title:"Project Context",            mode:"prose", p:"*",
+    hint:"What the project is, what stage it is at, and what the knowledge base already covers." },
+  { id:"audience",    title:"Audience",                   mode:"prose", p:["writing","marketing","consulting","support","education","product"],
+    hint:"Who the output is ultimately for. Shapes vocabulary, depth and formality." },
+  { id:"objectives",  title:"Objectives & Success Criteria", mode:"list", p:["general","consulting","product","data","research","marketing"],
+    hint:"What a good response optimises for when there is a tradeoff." },
+  { id:"workflow",    title:"How to Approach a Task",     mode:"list", p:"*",
+    hint:"The process to follow before answering — plan, check the knowledge base, ask, then execute." },
+  { id:"always",      title:"Always",                     mode:"list", p:"*",
+    hint:"Non-negotiable positive rules. Keep these concrete enough to actually check." },
+  { id:"never",       title:"Never",                      mode:"list", p:"*",
+    hint:"The Do-NOT list. Usually the most effective part of a project instruction set." },
+  { id:"format",      title:"Output Format",              mode:"list", p:"*",
+    hint:"The shape of a response: length, structure, code blocks, tables, next steps." },
+  { id:"voice",       title:"Tone & Voice",               mode:"list", p:"*",
+    hint:"How it should sound. Specific beats polite — 'no corporate filler' beats 'be professional'." },
+  { id:"sources",     title:"Sources & Evidence",         mode:"list", p:["research","legal","data","consulting","marketing"],
+    hint:"How to source claims and how to label what is evidence versus interpretation." },
+  { id:"uncertainty", title:"Uncertainty & Escalation",   mode:"list", p:"*",
+    hint:"Permission to say 'I don't know' is what makes the rest of the output trustworthy." },
+  { id:"glossary",    title:"Glossary & Naming",          mode:"list", p:["dev","product","data","consulting","marketing","support"],
+    hint:"Your terms, product names, stack and metric definitions, so nothing gets paraphrased wrong." },
+  { id:"boundaries",  title:"Scope & Boundaries",         mode:"list", p:["dev","consulting","legal","product","data","support","personal"],
+    hint:"What is off-limits, out of scope, or requires a human before it moves." },
+  { id:"examples",    title:"Examples of Good Output",    mode:"prose", p:["writing","marketing","support","consulting"],
+    hint:"One good example and one bad one teaches more than ten rules. Paste real samples here." }
+];
+
+const A = "*";
+const ITEMS = [
+  /* ---------- ROLE (prose) ---------- */
+  {s:"role", p:["general"],   t:"You are my thinking partner and drafting assistant on [project name]. Your job is to [primary purpose] and to save me time without costing me accuracy."},
+  {s:"role", p:["dev"],       t:"You are a senior software engineer working with me on [project name], a [type of application] built with [stack]. You write production-quality code, review changes, and debug alongside me."},
+  {s:"role", p:["writing"],   t:"You are an editorial partner for [publication / brand]. You draft, restructure and sharpen writing that goes out under my name — so it has to sound like me, not like a model."},
+  {s:"role", p:["research"],  t:"You are a research analyst supporting [topic / domain]. You gather evidence, verify it, and present findings with the reasoning and sources exposed."},
+  {s:"role", p:["consulting"],t:"You are a consulting associate on engagements for [client type]. You produce client-ready analysis and deliverables, and you protect me from sloppy or unsupported claims."},
+  {s:"role", p:["data"],      t:"You are a data analyst working in [warehouse / tool] on [dataset]. You write queries, interpret results, and are relentless about caveats."},
+  {s:"role", p:["marketing"], t:"You are a growth-marketing copywriter and strategist for [product], sold to [audience]. You write copy that gets a specific action, not copy that sounds impressive."},
+  {s:"role", p:["product"],   t:"You are a product management partner on [product]. You help me frame problems, weigh tradeoffs, write specs, and get to decisions."},
+  {s:"role", p:["support"],   t:"You are a customer support reply writer for [company], a [product category] company. You draft replies I can send with minimal editing."},
+  {s:"role", p:["education"], t:"You are a patient tutor for [subject] at [level]. Your goal is that I understand it well enough to explain it to someone else — not that I get this one answer."},
+  {s:"role", p:["legal"],     t:"You are a contract and policy reading assistant. You summarise what documents actually say, surface risk, and leave every legal conclusion to a qualified human."},
+  {s:"role", p:["personal"],  t:"You are my personal assistant for planning, admin and everyday decisions. You are practical, concise, and you reduce the number of steps between me and done."},
+
+  /* ---------- CONTEXT (prose) ---------- */
+  {s:"context", p:A, t:"[Project name] is [one-line description]. It exists to [purpose]. We are currently at [stage: exploring / building / shipping / maintaining]."},
+  {s:"context", p:A, t:"The knowledge base in this project contains [documents / code / transcripts / brand guide]. Treat it as the authoritative source before anything else."},
+  {s:"context", p:["dev","data","product"], t:"The stack is [languages, frameworks, database, hosting]. Key constraints: [performance, budget, compliance, team size]."},
+  {s:"context", p:["consulting","legal","product"], t:"Stakeholders and their interests: [name / role — what they care about]."},
+  {s:"context", p:["writing","marketing"], t:"Existing published work lives at [link / file]. Match its structure, rhythm and level of detail unless I say otherwise."},
+  {s:"context", p:["research","data"], t:"Prior findings I already accept as settled: [list]. Do not re-litigate these unless new evidence contradicts them."},
+
+  /* ---------- AUDIENCE (prose) ---------- */
+  {s:"audience", p:A, t:"The reader is [role / seniority]. They know [what they already know] and do not know [what to explain]. They are reading this to [decide / learn / act]."},
+  {s:"audience", p:["marketing","writing"], t:"They are skimming on a phone. Assume 20 seconds of attention before they decide whether to keep reading."},
+  {s:"audience", p:["consulting","product"], t:"They are time-poor and decision-oriented. Give them the recommendation, the tradeoff, and what you would need to be wrong."},
+  {s:"audience", p:["support"], t:"They are a frustrated customer who has already tried the obvious thing. Acknowledge that before explaining anything."},
+  {s:"audience", p:["education"], t:"The reader is me, at [level]. Pitch explanations just above where I currently am, not at a textbook."},
+
+  /* ---------- OBJECTIVES ---------- */
+  {s:"objectives", p:A, t:"Every response should move the project toward [primary goal]."},
+  {s:"objectives", p:A, t:"Prioritise accuracy over speed. A slower correct answer beats a fast wrong one every time."},
+  {s:"objectives", p:A, t:"Optimise for output I can use directly, without rewriting it first."},
+  {s:"objectives", p:["dev"], t:"Ship working code over explanation. Explain only what is not obvious from reading the code."},
+  {s:"objectives", p:["writing","marketing"], t:"Get me to 80% of a draft fast; I will do the last 20%. Do not polish before the shape is right."},
+  {s:"objectives", p:["product","consulting","data"], t:"Surface the decision I need to make, not just the information around it."},
+  {s:"objectives", p:["support"], t:"Resolve the issue in a single reply wherever the information allows it."},
+  {s:"objectives", p:["education"], t:"Build durable understanding, not just an answer to the question I asked."},
+  {s:"objectives", p:["research"], t:"Reduce my uncertainty measurably. Say what you learned and what remains open."},
+
+  /* ---------- WORKFLOW ---------- */
+  {s:"workflow", p:A, t:"Check this project's knowledge base first. Only go to outside sources if it does not cover the question, and say when you have."},
+  {s:"workflow", p:A, t:"Before a non-trivial task, restate the goal in one sentence so we agree on what you are doing."},
+  {s:"workflow", p:A, t:"Ask at most [2] clarifying questions when a request is ambiguous. Otherwise state your assumptions and proceed."},
+  {s:"workflow", p:["dev","consulting","product","research"], t:"For multi-step work, propose a short plan and wait for a go-ahead before executing it."},
+  {s:"workflow", p:["dev"], t:"Read the relevant existing files before proposing changes to them."},
+  {s:"workflow", p:["dev"], t:"Reproduce the problem before proposing a fix. If you cannot reproduce it, say so and list what you would need."},
+  {s:"workflow", p:["research","marketing","legal","product"], t:"Search for anything that could have changed in the last [12] months rather than answering from memory."},
+  {s:"workflow", p:["data","research"], t:"Show the query, formula or calculation behind any number you report."},
+  {s:"workflow", p:["writing","marketing"], t:"Work in passes: outline, then draft, then tighten. Show me the outline before you write the draft."},
+  {s:"workflow", p:["writing","marketing","support"], t:"Review my previous work in this project for voice and structure before drafting anything new."},
+  {s:"workflow", p:["support"], t:"Start from the customer's actual words before mapping the issue to a known category."},
+  {s:"workflow", p:["education"], t:"Ask me what I think first. Only give the full answer after I have attempted it or explicitly asked."},
+  {s:"workflow", p:["consulting","legal"], t:"Separate the work into what you can determine from the documents and what needs a human judgement call."},
+
+  /* ---------- ALWAYS ---------- */
+  {s:"always", p:A, t:"Follow the conventions already present in this project over generic best practice."},
+  {s:"always", p:A, t:"Give the direct answer first, then the reasoning behind it."},
+  {s:"always", p:A, t:"Tell me when something I have asked for is a bad idea, and why. I would rather be corrected than agreed with."},
+  {s:"always", p:A, t:"Flag any assumption you had to make, in a short list at the end of the response."},
+  {s:"always", p:A, t:"Preserve existing meaning, behaviour and wording unless changing it is what I asked for."},
+  {s:"always", p:["dev"], t:"Write [language + version] with [strict typing / type hints], explicit error handling, and no silent failures."},
+  {s:"always", p:["dev"], t:"Include tests for new logic using [test framework], covering the edge case as well as the happy path."},
+  {s:"always", p:["dev"], t:"Keep functions small and name things for what they do, not how they do it."},
+  {s:"always", p:["dev","product","legal"], t:"Call out the [security / privacy / accessibility] implications of anything you propose."},
+  {s:"always", p:["research","legal"], t:"Quote the exact source text you are relying on, not a paraphrase of it."},
+  {s:"always", p:["data","research"], t:"Distinguish what the data shows from what you infer from it, in separate labelled parts."},
+  {s:"always", p:["data"], t:"State the sample size, date range and any filters behind every number."},
+  {s:"always", p:["writing","marketing","support"], t:"Write in my voice, using the samples in the knowledge base as the reference for it."},
+  {s:"always", p:["writing","marketing"], t:"Apply [style guide] for spelling, punctuation, capitalisation and number formatting."},
+  {s:"always", p:["marketing","support","product"], t:"Make the reader's next action obvious and singular."},
+  {s:"always", p:["research","legal","consulting"], t:"Note a confidence level on any claim that is not directly sourced."},
+  {s:"always", p:["consulting","product"], t:"Name the tradeoff attached to every recommendation. There is always one."},
+  {s:"always", p:["education"], t:"Show the working, step by step, and name the concept each step relies on."},
+  {s:"always", p:["personal"], t:"Give me the shortest path to done, and say what it costs in time or money."},
+
+  /* ---------- NEVER ---------- */
+  {s:"never", p:A, t:"Never invent facts, sources, quotes, statistics or citations. If you do not know, say so."},
+  {s:"never", p:A, t:"Never open with filler like 'Great question' or 'Certainly'. Start with the substance."},
+  {s:"never", p:A, t:"Never pad a response by restating my question or summarising what you just said."},
+  {s:"never", p:A, t:"Never add disclaimers, caveats or safety hedging I did not ask for."},
+  {s:"never", p:A, t:"Never use emoji."},
+  {s:"never", p:["writing","marketing"], t:"Never use these tells: 'delve', 'leverage', 'seamless', 'in today's fast-paced', 'it's not just X, it's Y', or a tricolon in every paragraph."},
+  {s:"never", p:["writing","marketing"], t:"Never use em dashes. Use a comma, a full stop, or a colon instead."},
+  {s:"never", p:["dev","writing"], t:"Never change code, files or wording outside the scope of what I asked for."},
+  {s:"never", p:["dev","data","support"], t:"Never include real credentials, API keys, tokens or real customer data — use obvious placeholders."},
+  {s:"never", p:["dev"], t:"Never rewrite working code purely to modernise it, and never introduce a dependency without saying why."},
+  {s:"never", p:["data","product"], t:"Never present a projection, model output or estimate as if it were a measured result."},
+  {s:"never", p:["legal"], t:"Never give legal advice or state a legal conclusion. Describe what the document says and flag the risk for a human reviewer."},
+  {s:"never", p:["support"], t:"Never promise a customer anything outside documented policy, including timelines, refunds or exceptions."},
+  {s:"never", p:["consulting","product"], t:"Never recommend a vendor, tool or spend without naming the cost and the alternative."},
+  {s:"never", p:["education"], t:"Never hand me the finished answer before I have tried. Ask a guiding question instead."},
+  {s:"never", p:["research"], t:"Never cite a source you have not actually read in this conversation."},
+  {s:"never", p:["consulting","legal","personal"], t:"Never share, restate or suggest publishing anything from this project outside it."},
+
+  /* ---------- FORMAT ---------- */
+  {s:"format", p:A, t:"Default to [under 300 words] unless I ask for depth."},
+  {s:"format", p:A, t:"Short paragraphs and bullets. No walls of text."},
+  {s:"format", p:A, t:"Use headings only when a response has three or more distinct parts."},
+  {s:"format", p:["consulting","research","product"], t:"Lead anything longer than a page with a [2]-line summary of the conclusion."},
+  {s:"format", p:["consulting","product","marketing"], t:"End with a short 'Next steps' list of concrete, assignable actions."},
+  {s:"format", p:["dev","data"], t:"Put code in fenced blocks with the language tagged, and keep commentary outside the block."},
+  {s:"format", p:["dev"], t:"When changing existing code, show a diff or the specific changed lines — not the whole file."},
+  {s:"format", p:["data"], t:"Present data as a markdown table with units and time period in the header row."},
+  {s:"format", p:["writing","marketing"], t:"Deliver drafts as clean prose I can paste straight out — no preamble, no 'here is your draft'."},
+  {s:"format", p:["support"], t:"Give the reply text only, ready to send, in [under 120 words]."},
+  {s:"format", p:["education","support"], t:"Use numbered steps for anything procedural, one action per step."},
+  {s:"format", p:["research","legal"], t:"Cite sources inline as [Title](URL) and list them all at the end."},
+  {s:"format", p:["consulting","product","writing"], t:"Match the structure of [template name] in the knowledge base."},
+  {s:"format", p:["personal"], t:"When there is a choice to make, give me a table of options with the cost, the effort and the catch."},
+
+  /* ---------- VOICE ---------- */
+  {s:"voice", p:A, t:"Direct and plain. Short sentences. No corporate filler."},
+  {s:"voice", p:A, t:"Peer to peer, not deferential. Disagree with me when you have grounds to."},
+  {s:"voice", p:A, t:"No hype, no superlatives, no exclamation points."},
+  {s:"voice", p:["support","personal","education"], t:"Warm but efficient — friendly without being chatty."},
+  {s:"voice", p:["marketing","support","education"], t:"Write at roughly a [grade 8] reading level. Prefer the shorter word."},
+  {s:"voice", p:["research","consulting","data"], t:"Confident where the evidence is strong, explicitly uncertain where it is not."},
+  {s:"voice", p:["dev","data"], t:"Technical and precise. Assume I know [the domain] and skip the fundamentals."},
+  {s:"voice", p:["consulting","legal"], t:"Match the formality of [the audience]. Professional, never stiff."},
+  {s:"voice", p:["writing","marketing"], t:"Active voice. Concrete nouns. Cut every adverb you can live without."},
+
+  /* ---------- SOURCES ---------- */
+  {s:"sources", p:A, t:"Treat this project's knowledge base as authoritative. The open web is secondary and should be labelled as such."},
+  {s:"sources", p:A, t:"Never cite a source you have not opened and read in this conversation."},
+  {s:"sources", p:["research","legal"], t:"Prefer primary sources — filings, papers, documentation, the actual contract — over summaries and aggregators."},
+  {s:"sources", p:["research","marketing"], t:"Note the publication date of every source and flag anything older than [2] years."},
+  {s:"sources", p:["research","consulting"], t:"When two sources conflict, show both, say which is more credible, and say why."},
+  {s:"sources", p:["research","data","consulting"], t:"Label each part of the response as SOURCED or ANALYSIS so I can see where evidence stops."},
+  {s:"sources", p:["dev","legal"], t:"Link to the exact section, clause or line — not just the document."},
+  {s:"sources", p:["data"], t:"Name the table, dashboard or file every figure came from."},
+
+  /* ---------- UNCERTAINTY ---------- */
+  {s:"uncertainty", p:A, t:"If you are not confident, say 'I'm not sure' and state what would resolve it."},
+  {s:"uncertainty", p:A, t:"If the knowledge base does not cover something, say so explicitly instead of filling the gap."},
+  {s:"uncertainty", p:A, t:"If a request conflicts with an instruction here, stop and ask rather than picking one silently."},
+  {s:"uncertainty", p:["consulting","legal","product","support"], t:"Flag anything needing a human decision on its own line, starting with 'NEEDS DECISION:'."},
+  {s:"uncertainty", p:["consulting","data","research"], t:"Rate your confidence as high, medium or low on every recommendation, with a one-line reason."},
+  {s:"uncertainty", p:["support","legal"], t:"Escalate rather than guess on [policy, pricing, legal, medical, security] questions."},
+  {s:"uncertainty", p:["dev"], t:"If a fix is a guess, say it is a guess and tell me how to verify it."},
+
+  /* ---------- GLOSSARY ---------- */
+  {s:"glossary", p:A, t:"In this project, '[term]' means [definition]."},
+  {s:"glossary", p:A, t:"Refer to the product as [exact name]. Never [old name / common misspelling]."},
+  {s:"glossary", p:A, t:"Spell out an acronym on first use, then use the short form."},
+  {s:"glossary", p:["dev","product"], t:"Our names for systems and environments: [name = what it is]. Use these, not generic descriptions."},
+  {s:"glossary", p:["data","product","marketing"], t:"Metric definitions: [metric = exactly how it is calculated]. Do not substitute a similar metric."},
+  {s:"glossary", p:["consulting","support"], t:"Refer to people by [role, not name / first name only] in anything that could leave this project."},
+
+  /* ---------- BOUNDARIES ---------- */
+  {s:"boundaries", p:A, t:"Out of scope for this project: [topics]. If I drift there, say so and bring me back."},
+  {s:"boundaries", p:["dev"], t:"Do not touch [files / directories / infrastructure] without asking first."},
+  {s:"boundaries", p:["dev","product"], t:"I have [no design resource / no backend help / no budget for new tools]. Do not propose solutions that need one."},
+  {s:"boundaries", p:["consulting","legal"], t:"Treat everything here as confidential. Never suggest sharing it externally or with another client."},
+  {s:"boundaries", p:["data","legal","support"], t:"Replace any personal or customer data with placeholders before using it in an example."},
+  {s:"boundaries", p:["product","consulting"], t:"Hard constraints: [time / cost / headcount]. Reject proposals that exceed them instead of hand-waving."},
+  {s:"boundaries", p:["support"], t:"Anything involving [refunds / legal threats / security incidents] goes to a human, not a drafted reply."},
+  {s:"boundaries", p:["personal"], t:"Do not make commitments, bookings or purchases on my behalf — draft them and let me send."},
+
+  /* ---------- EXAMPLES (prose) ---------- */
+  {s:"examples", p:A, t:"GOOD — this is the standard to hit:\n[paste a real example of output you were happy with]"},
+  {s:"examples", p:A, t:"BAD — do not do this:\n[paste a weak example, then one line on exactly what makes it weak]"},
+  {s:"examples", p:["support","marketing"], t:"Opening lines that work: [example]. Opening lines that do not: [example]."}
+];
+</script>
+<script>
+"use strict";
+
+/* ============================ HELPERS ============================ */
+const $  = (s, r) => (r || document).querySelector(s);
+const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+const uid = () => Math.random().toString(36).slice(2, 9);
+const esc = s => String(s).replace(/[&<>]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;" }[c]));
+const matches = (p, pid) => p === "*" || (Array.isArray(p) && p.indexOf(pid) !== -1);
+const SVG = {
+  sun:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
+  moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>',
+  caret:'<svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
+  x:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>'
+};
+const KEY = "cpi.state.v1";
+const CREDIT = "Generated with Claude Instruct \u2014 claudeinstruct.surge.sh";
+function attribOn() {
+  try { return localStorage.getItem("cpi.attrib") !== "off"; } catch (e) { return true; }
+}
+
+/* ============================ STATE ============================ */
+let state = null;
+let undoState = null;
+
+function buildFromProfile(pid) {
+  const blocks = SECTIONS.filter(sec => matches(sec.p, pid)).map(sec => ({
+    id: uid(), sid: sec.id, title: sec.title, mode: sec.mode, hint: sec.hint,
+    collapsed: false, showAll: false,
+    items: ITEMS.filter(it => it.s === sec.id).map(it => ({
+      id: uid(), t: it.t, on: matches(it.p, pid)
+    }))
+  }));
+  blocks.forEach(b => { if (!b.items.some(i => i.on) && b.items[0]) b.items[0].on = true; });
+  return { profile: pid, blocks: blocks };
+}
+
+function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+function load() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (!raw) return null;
+    const s = JSON.parse(raw);
+    return (s && Array.isArray(s.blocks)) ? s : null;
+  } catch (e) { return null; }
+}
+
+/* ============================ TEXT OUTPUT ============================ */
+function liveItems(b) { return b.items.filter(i => i.on && String(i.t).trim() !== ""); }
+
+function buildText() {
+  const out = [];
+  state.blocks.forEach(b => {
+    const items = liveItems(b);
+    if (!items.length) return;
+    out.push("## " + (String(b.title || "").trim() || "Untitled block"));
+    if (b.mode === "prose") out.push(items.map(i => i.t.trim()).join("\n\n"));
+    else out.push(items.map(i => "- " + i.t.trim().replace(/^[-*]\s*/, "")).join("\n"));
+    out.push("");
+  });
+  let txt = out.join("\n").replace(/\n{3,}/g, "\n\n").trim() + "\n";
+  if (attribOn()) txt += "\n---\n" + CREDIT + "\n";
+  return txt;
+}
+
+function renderPreview() {
+  const body = $("#pvBody");
+  const txt = buildText();
+  const blocks = state.blocks.filter(b => liveItems(b).length);
+  if (!blocks.length) {
+    body.innerHTML = '<p class="pv-empty">Nothing selected yet. Tick a few lines on the left and they will appear here.</p>';
+  } else {
+    let html = "";
+    blocks.forEach(b => {
+      const items = liveItems(b);
+      html += "<h4>" + esc(String(b.title || "").trim() || "Untitled block") + "</h4>";
+      const lines = b.mode === "prose"
+        ? items.map(i => i.t.trim()).join("\n\n")
+        : items.map(i => "- " + i.t.trim().replace(/^[-*]\s*/, "")).join("\n");
+      html += esc(lines).replace(/\[([^\]\n]{1,80})\]/g, '<span class="ph">[$1]</span>') + "\n";
+    });
+    if (attribOn()) html += '\n<span class="credit">---\n' + esc(CREDIT) + "</span>\n";
+    body.innerHTML = html;
+  }
+  const words = txt.trim() ? txt.trim().split(/\s+/).length : 0;
+  const phs = (txt.match(/\[[^\]\n]{1,80}\]/g) || []).length;
+  $("#statWords").innerHTML = "<b>" + words + "</b> words";
+  const chars = $("#statChars");
+  chars.innerHTML = "<b>" + txt.trim().length.toLocaleString() + "</b> chars";
+  chars.classList.toggle("warn", txt.length > 9000);
+  const ph = $("#statPh");
+  ph.innerHTML = phs ? "<b>" + phs + "</b> to fill" : "<b>0</b> to fill";
+  ph.classList.toggle("warn", phs > 0);
+}
+
+/* ============================ RENDER ============================ */
+function tallyEl(b) {
+  const on = liveItems(b).length;
+  return '<span class="tally' + (on ? " on" : "") + '">' + on + "/" + b.items.length + "</span>";
+}
+
+function render() {
+  const wrap = $("#blocks");
+  wrap.innerHTML = "";
+  state.blocks.forEach((b, bi) => {
+    const el = document.createElement("section");
+    el.className = "block" + (b.collapsed ? " collapsed" : "");
+    el.dataset.id = b.id;
+
+    const off = b.items.filter(i => !i.on).length;
+    const hideExtras = !b.showAll && off > 3;
+
+    let itemsHtml = "";
+    b.items.forEach(i => {
+      const hidden = hideExtras && !i.on;
+      itemsHtml +=
+        '<li class="item" data-id="' + i.id + '"' + (hidden ? ' style="display:none"' : "") + ">" +
+          '<input class="box" type="checkbox" ' + (i.on ? "checked" : "") + ' aria-label="Include this line">' +
+          '<div class="txt" contenteditable="true" spellcheck="false">' + esc(i.t) + "</div>" +
+          '<button class="kill" title="Delete this line" aria-label="Delete this line">' + SVG.x + "</button>" +
+        "</li>";
+    });
+
+    el.innerHTML =
+      '<div class="block-h">' +
+        '<span class="grip" title="Drag to reorder">&#9782;</span>' +
+        "<h3" + (b.sid === "custom" ? ' contenteditable="true" spellcheck="false"' : "") + ">" + esc(b.title) + "</h3>" +
+        tallyEl(b) +
+        '<button class="iconbtn" data-act="collapse" title="Collapse">' + SVG.caret + "</button>" +
+        '<button class="iconbtn" data-act="remove" title="Remove block">' + SVG.x + "</button>" +
+      "</div>" +
+      '<div class="block-b">' +
+        (b.hint ? '<p class="hint">' + esc(b.hint) + "</p>" : "") +
+        '<ul class="items">' + itemsHtml + "</ul>" +
+        (hideExtras ? '<button class="addline" data-act="more">+ ' + off + " more preset option" + (off === 1 ? "" : "s") + "</button> " : "") +
+        (!hideExtras && off > 3 ? '<button class="addline" data-act="less">&minus; Hide unused options</button> ' : "") +
+        '<button class="addline" data-act="additem">+ Add your own line</button>' +
+      "</div>";
+
+    wrap.appendChild(el);
+  });
+  renderAddSelect();
+  renderPreview();
+  save();
+}
+
+function renderAddSelect() {
+  const sel = $("#addSelect");
+  const used = new Set(state.blocks.map(b => b.sid));
+  const avail = SECTIONS.filter(s => !used.has(s.id));
+  sel.innerHTML = avail.length
+    ? avail.map(s => '<option value="' + s.id + '">' + esc(s.title) + "</option>").join("")
+    : '<option value="">All preset blocks are in use</option>';
+  sel.disabled = !avail.length;
+  $("#addBtn").disabled = !avail.length;
+  $("#addBtn").style.opacity = avail.length ? "1" : ".45";
+}
+
+function findBlock(el) {
+  const host = el.closest(".block");
+  return host ? state.blocks.find(b => b.id === host.dataset.id) : null;
+}
+
+/* ============================ EVENTS: blocks ============================ */
+$("#blocks").addEventListener("click", e => {
+  const b = findBlock(e.target); if (!b) return;
+  const act = e.target.closest("[data-act]");
+  if (act) {
+    const a = act.dataset.act;
+    if (a === "collapse") { b.collapsed = !b.collapsed; render(); }
+    if (a === "remove")   { removeBlock(b); }
+    if (a === "more")     { b.showAll = true;  render(); }
+    if (a === "less")     { b.showAll = false; render(); }
+    if (a === "additem") {
+      b.items.push({ id: uid(), t: "", on: true });
+      b.showAll = true; render();
+      const li = $('.block[data-id="' + b.id + '"] .item:last-child .txt');
+      if (li) li.focus();
+    }
+    return;
+  }
+  const kill = e.target.closest(".kill");
+  if (kill) {
+    const li = kill.closest(".item");
+    b.items = b.items.filter(i => i.id !== li.dataset.id);
+    render();
+  }
+});
+
+$("#blocks").addEventListener("change", e => {
+  if (!e.target.classList.contains("box")) return;
+  const b = findBlock(e.target); if (!b) return;
+  const li = e.target.closest(".item");
+  const it = b.items.find(i => i.id === li.dataset.id);
+  if (!it) return;
+  it.on = e.target.checked;
+  const t = $(".tally", li.closest(".block"));
+  const on = liveItems(b).length;
+  t.textContent = on + "/" + b.items.length;
+  t.classList.toggle("on", on > 0);
+  renderPreview(); save();
+});
+
+$("#blocks").addEventListener("input", e => {
+  const b = findBlock(e.target); if (!b) return;
+  if (e.target.classList.contains("txt")) {
+    const li = e.target.closest(".item");
+    const it = b.items.find(i => i.id === li.dataset.id);
+    if (it) it.t = e.target.innerText;
+    renderPreview(); save();
+  } else if (e.target.tagName === "H3") {
+    b.title = e.target.innerText.trim() || "Untitled block";
+    renderPreview(); save();
+  }
+});
+
+/* paste as plain text inside editable fields */
+$("#blocks").addEventListener("paste", e => {
+  const t = e.target;
+  if (t.classList && (t.classList.contains("txt") || t.tagName === "H3")) {
+    e.preventDefault();
+    const txt = (e.clipboardData || window.clipboardData).getData("text");
+    document.execCommand("insertText", false, txt);
+  }
+});
+
+function removeBlock(b) {
+  undoState = JSON.parse(JSON.stringify(state));
+  state.blocks = state.blocks.filter(x => x.id !== b.id);
+  render();
+  toast("Removed " + b.title, "Undo", restoreUndo);
+}
+
+/* ============================ DRAG & DROP ============================ */
+let dragId = null;
+$("#blocks").addEventListener("mousedown", e => {
+  const g = e.target.closest(".grip");
+  if (g) g.closest(".block").setAttribute("draggable", "true");
+});
+$("#blocks").addEventListener("mouseup", () => $$(".block").forEach(b => b.removeAttribute("draggable")));
+$("#blocks").addEventListener("dragstart", e => {
+  const el = e.target.closest(".block"); if (!el) return;
+  dragId = el.dataset.id; el.classList.add("dragging");
+  e.dataTransfer.effectAllowed = "move";
+  try { e.dataTransfer.setData("text/plain", dragId); } catch (err) {}
+});
+$("#blocks").addEventListener("dragover", e => {
+  if (!dragId) return;
+  e.preventDefault();
+  const el = e.target.closest(".block"); if (!el || el.dataset.id === dragId) return;
+  const r = el.getBoundingClientRect();
+  const before = e.clientY < r.top + r.height / 2;
+  $$(".block").forEach(x => x.classList.remove("drop-before", "drop-after"));
+  el.classList.add(before ? "drop-before" : "drop-after");
+});
+$("#blocks").addEventListener("drop", e => {
+  if (!dragId) return;
+  e.preventDefault();
+  const el = e.target.closest(".block"); if (!el) return;
+  const before = el.classList.contains("drop-before");
+  const from = state.blocks.findIndex(b => b.id === dragId);
+  const moved = state.blocks.splice(from, 1)[0];
+  let to = state.blocks.findIndex(b => b.id === el.dataset.id);
+  if (!before) to += 1;
+  state.blocks.splice(to, 0, moved);
+  dragId = null; render();
+});
+$("#blocks").addEventListener("dragend", () => {
+  dragId = null;
+  $$(".block").forEach(x => { x.classList.remove("dragging", "drop-before", "drop-after"); x.removeAttribute("draggable"); });
+});
+
+/* ============================ PROFILES ============================ */
+function renderChips() {
+  $("#profileChips").innerHTML = PROFILES.map(p =>
+    '<button class="chip" data-id="' + p.id + '" aria-pressed="' + (p.id === state.profile) + '"><span class="dot"></span>' + esc(p.name) + "</button>"
+  ).join("");
+  const cur = PROFILES.find(p => p.id === state.profile);
+  $("#profileDesc").textContent = cur
+    ? cur.blurb + " Nothing is locked — every line stays editable."
+    : "Pick a profile to pre-select the sections and rules that matter most for that kind of work.";
+}
+$("#profileChips").addEventListener("click", e => {
+  const c = e.target.closest(".chip"); if (!c) return;
+  const pid = c.dataset.id;
+  if (pid === state.profile) return;
+  undoState = JSON.parse(JSON.stringify(state));
+  state = buildFromProfile(pid);
+  renderChips(); render(); syncUrlAndTitle();
+  const name = (PROFILES.find(p => p.id === pid) || {}).name;
+  toast("Loaded the " + name + " profile", "Undo", restoreUndo);
+});
+function restoreUndo() {
+  if (!undoState) return;
+  state = undoState; undoState = null;
+  renderChips(); render(); syncUrlAndTitle();
+}
+
+/* ============================ ADD BLOCKS ============================ */
+$("#addBtn").addEventListener("click", () => {
+  const sid = $("#addSelect").value; if (!sid) return;
+  const sec = SECTIONS.find(s => s.id === sid); if (!sec) return;
+  state.blocks.push({
+    id: uid(), sid: sec.id, title: sec.title, mode: sec.mode, hint: sec.hint,
+    collapsed: false, showAll: true,
+    items: ITEMS.filter(i => i.s === sec.id).map(i => ({ id: uid(), t: i.t, on: matches(i.p, state.profile) }))
+  });
+  render();
+  const el = $('.block[data-id="' + state.blocks[state.blocks.length - 1].id + '"]');
+  if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+});
+$("#customBtn").addEventListener("click", () => {
+  state.blocks.push({
+    id: uid(), sid: "custom", title: "Untitled block", mode: "list", hint: "Your own block. Click the heading to rename it.",
+    collapsed: false, showAll: true, items: [{ id: uid(), t: "", on: true }]
+  });
+  render();
+  const el = $('.block[data-id="' + state.blocks[state.blocks.length - 1].id + '"]');
+  if (el) {
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    const h = $("h3", el);
+    if (h) {
+      h.focus();
+      const r = document.createRange(); r.selectNodeContents(h);
+      const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+    }
+  }
+});
+
+/* ============================ TOOLBAR ============================ */
+$("#expandBtn").addEventListener("click", () => {
+  const anyOpen = state.blocks.some(b => !b.collapsed);
+  state.blocks.forEach(b => b.collapsed = anyOpen);
+  $("#expandBtn").textContent = anyOpen ? "Expand all" : "Collapse all";
+  render();
+});
+$("#resetBtn").addEventListener("click", () => {
+  undoState = JSON.parse(JSON.stringify(state));
+  state = buildFromProfile(state.profile);
+  renderChips(); render();
+  toast("Reset to the profile defaults", "Undo", restoreUndo);
+});
+$("#exportBtn").addEventListener("click", () => {
+  download(JSON.stringify(state, null, 2), "claude-instruct-config.json", "application/json");
+  toast("Config exported");
+});
+$("#importBtn").addEventListener("click", () => $("#importFile").click());
+$("#importFile").addEventListener("change", e => {
+  const f = e.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const s = JSON.parse(r.result);
+      if (!s || !Array.isArray(s.blocks)) throw new Error("bad file");
+      undoState = JSON.parse(JSON.stringify(state));
+      state = s; renderChips(); render();
+      toast("Config imported", "Undo", restoreUndo);
+    } catch (err) { toast("That file could not be read"); }
+  };
+  r.readAsText(f);
+  e.target.value = "";
+});
+
+/* ============================ OUTPUT ============================ */
+function download(text, name, type) {
+  const blob = new Blob([text], { type: (type || "text/plain") + ";charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+$("#genBtn").addEventListener("click", () => {
+  const txt = buildText();
+  if (txt.trim().length < 5) { toast("Select at least one line first"); return; }
+  download(txt, "claude-project-instructions-" + state.profile + ".txt");
+  toast("Saved project-instructions.txt");
+  maybeNudge();
+});
+$("#copyBtn").addEventListener("click", async () => {
+  const txt = buildText();
+  if (txt.trim().length < 5) { toast("Select at least one line first"); return; }
+  try {
+    await navigator.clipboard.writeText(txt);
+    toast("Copied — paste into your Claude project");
+    maybeNudge();
+  } catch (e) {
+    const ta = document.createElement("textarea");
+    ta.value = txt; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); toast("Copied — paste into your Claude project"); }
+    catch (err) { toast("Copy failed — use Generate .txt instead"); }
+    ta.remove();
+  }
+});
+
+/* ============================ ATTRIBUTION + NUDGE ============================ */
+$("#attribBox").checked = attribOn();
+$("#attribBox").addEventListener("change", e => {
+  try { localStorage.setItem("cpi.attrib", e.target.checked ? "on" : "off"); } catch (err) {}
+  renderPreview();
+});
+function maybeNudge() {
+  try {
+    if (localStorage.getItem("cpi.nudge") === "off") return;
+    localStorage.setItem("cpi.nudge", "seen");
+  } catch (e) {}
+  setTimeout(() => $("#nudge").classList.add("show"), 900);
+}
+$("#nudgeX").addEventListener("click", () => {
+  $("#nudge").classList.remove("show");
+  try { localStorage.setItem("cpi.nudge", "off"); } catch (e) {}
+});
+
+/* ============================ THEME / MISC ============================ */
+function setTheme(t) {
+  document.documentElement.setAttribute("data-theme", t);
+  $("#themeBtn").innerHTML = t === "dark" ? SVG.sun : SVG.moon;
+  try { localStorage.setItem("cpi.theme", t); } catch (e) {}
+}
+$("#themeBtn").addEventListener("click", () =>
+  setTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark")
+);
+$("#jumpBtn").addEventListener("click", () =>
+  $("#previewCol").scrollIntoView({ behavior: "smooth", block: "start" })
+);
+
+let toastT = null;
+function toast(msg, actionLabel, fn) {
+  const el = $("#toast");
+  el.innerHTML = esc(msg);
+  if (actionLabel && fn) {
+    const b = document.createElement("button");
+    b.textContent = actionLabel;
+    b.style.cssText = "margin-left:12px;font-weight:700;color:var(--accent);text-decoration:underline";
+    b.onclick = () => { fn(); el.classList.remove("show"); };
+    el.appendChild(b);
+  }
+  el.classList.add("show");
+  clearTimeout(toastT);
+  toastT = setTimeout(() => el.classList.remove("show"), actionLabel ? 7000 : 2600);
+}
+
+document.addEventListener("keydown", e => {
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s") { e.preventDefault(); $("#genBtn").click(); }
+});
+
+/* ============================ DEEP LINKS ============================ */
+const BASE_TITLE = "Claude Instruct \u2014 Project Instructions Generator for Claude AI";
+function syncUrlAndTitle() {
+  const p = PROFILES.find(x => x.id === state.profile);
+  document.title = (p && p.id !== "general")
+    ? p.name + " project instructions \u2014 Claude Instruct"
+    : BASE_TITLE;
+  try {
+    const url = state.profile === "general"
+      ? location.pathname
+      : location.pathname + "?profile=" + encodeURIComponent(state.profile);
+    history.replaceState(null, "", url + location.hash);
+  } catch (e) {}
+}
+
+/* ============================ INIT ============================ */
+setTheme(document.documentElement.getAttribute("data-theme") || "light");
+let qp = null;
+try { qp = new URLSearchParams(location.search).get("profile"); } catch (e) {}
+if (qp && PROFILES.some(p => p.id === qp)) state = buildFromProfile(qp);
+else state = load() || buildFromProfile("general");
+renderChips();
+render();
+syncUrlAndTitle();
+</script>
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "WebApplication",
+   "@id": "https://claudeinstruct.surge.sh/#app",
+   "name": "Claude Instruct",
+   "alternateName": "Claude Project Instructions Generator",
+   "url": "https://claudeinstruct.surge.sh/",
+   "description": "A free, open-source generator for Claude AI project instructions. Pick a use-case profile, toggle proven rule blocks, edit anything inline, and download a text file to paste into your Claude project instructions.",
+   "applicationCategory": "DeveloperApplication",
+   "applicationSubCategory": "Productivity",
+   "operatingSystem": "Any modern web browser",
+   "browserRequirements": "Requires JavaScript",
+   "isAccessibleForFree": true,
+   "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+   },
+   "image": "https://claudeinstruct.surge.sh/og.png",
+   "screenshot": "https://claudeinstruct.surge.sh/og.png",
+   "featureList": [
+    "Twelve use-case profiles that pre-select the right sections and rules",
+    "Around 150 pre-written, editable instruction lines",
+    "Custom blocks with your own headings",
+    "Drag to reorder blocks",
+    "Live preview with word, character and placeholder counts",
+    "Download as .txt or copy to clipboard",
+    "Autosave to local storage plus JSON export and import",
+    "Light and dark themes"
+   ],
+   "author": {
+    "@type": "Person",
+    "name": "Don Liggett",
+    "url": "https://github.com/donliggett"
+   },
+   "license": "https://opensource.org/licenses/MIT",
+   "softwareVersion": "1.0",
+   "codeRepository": "https://github.com/donliggett/claude-project-instruct"
+  },
+  {
+   "@type": "FAQPage",
+   "@id": "https://claudeinstruct.surge.sh/#faq",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Where do I paste the generated file?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Open your project in the Claude app and find the project instructions panel in the project sidebar, then paste the whole file in. The instructions apply to every new conversation you start inside that project."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "How long should project instructions be?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Shorter than you think. For most projects, somewhere between 200 and 600 words of specific, checkable rules works better than several pages of general guidance — every extra line competes for attention with the ones that matter. The character counter in the preview pane flags anything over about 9,000 characters so you can trim before you paste."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What is the difference between project instructions, a system prompt, and CLAUDE.md?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "They are the same idea delivered in three places. Project instructions apply to every chat inside one Claude project. A system prompt is passed per request through the API. CLAUDE.md is the file Claude Code reads from a repository. The structure this generator produces works in all three — the output is plain text, so you can paste it wherever your setup expects it."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Why does the “Never” list matter so much?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Prohibitions are concrete in a way that aspirations are not. “Never invent statistics or citations” is something a model can check its own draft against; “be accurate” is not. If you only write two sections, write Role and Never."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What are the square brackets in the generated text?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "They are placeholders you are meant to fill in, like [project name] or [test framework]. The preview pane highlights every one and keeps a running count so nothing ships half-written. Instructions full of unreplaced placeholders are worse than none at all."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Does Claude Instruct send my data anywhere?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Your instructions never leave your browser. There is no account, no upload and no server-side storage — everything you type is kept in local storage on your own device, and you can export it as JSON at any time. The page does load Cloudflare Web Analytics, a cookieless script that counts anonymous page views so I can see whether anyone is using this. Nothing you type is ever part of that."
+     }
+    }
+   ]
+  }
+ ]
+}
+</script>
+<!-- Cloudflare Web Analytics.
+     This does nothing until the token below is real: create the site at
+     Cloudflare dashboard > Web Analytics > Add a site, then paste the beacon
+     token here. Cookieless, no personal data, no consent banner required.
+     If you remove this script, also soften the privacy answer in the FAQ
+     above and in the JSON-LD block, which both mention it. -->
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "REPLACE_WITH_YOUR_BEACON_TOKEN"}'></script>
+</body>
+</html>
